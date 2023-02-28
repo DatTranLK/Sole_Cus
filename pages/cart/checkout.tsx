@@ -4,12 +4,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "store";
 import CheckoutStatus from "../../components/checkout-status";
 import CheckoutItems from "../../components/checkout/items";
-// import { ProductStoreType } from 'types';
 import { debounce } from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { removeProduct } from "store/reducers/cart";
+import { clearCart } from "store/reducers/cart";
 import Layout from "../../layouts/Main";
+import Link from "next/link";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -40,27 +40,6 @@ const CheckoutPage = () => {
     return cartItems;
   });
 
-  // const successful = () => {
-  //   toast.success("Đặt hàng thành công", {
-  //     position: toast.POSITION.TOP_RIGHT,
-  //     autoClose: false,
-  //   });
-  // };
-
-  // const fail = () => {
-  //   toast.error("Đơn hàng không hợp lệ, xin vui lòng kiểm tra lại thông tin", {
-  //     position: toast.POSITION.TOP_RIGHT,
-  //     autoClose: 20000,
-  //   });
-  // };
-
-  // const addressValidate = () => {
-  //   toast.error("Đơn hàng không hợp lệ, xin vui lòng kiểm tra lại thông tin", {
-  //     position: toast.POSITION.TOP_RIGHT,
-  //     autoClose: 20000,
-  //   });
-  // };
-
   const ids = useSelector((state: RootState) => {
     const cartItems = state.cart.cartItems;
     if (cartItems.length > 0) {
@@ -71,13 +50,11 @@ const CheckoutPage = () => {
 
     return listId;
   });
-  // console.log("is: ",typeof(listId));
 
   const listQuantities: number[] = [];
 
   const quantities = useSelector((state: RootState) => {
     const cartItems = state.cart.cartItems;
-    // console.log("cart", cartItems);
 
     if (cartItems.length > 0) {
       cartItems.map((item) => {
@@ -87,12 +64,6 @@ const CheckoutPage = () => {
 
     return listQuantities;
   });
-  // console.log("count quanti", quantities);
-
-  // const handleInputAddress = (e: any) => {
-  //   // e.preventDefault();
-  //   setAddress(e.target.value);
-  // };
 
   type UserInfo = {
     _id: number;
@@ -115,7 +86,6 @@ const CheckoutPage = () => {
 
   console.log("Address: ", address);
 
-  // setTimeout(() => {}, 500);
   async function handleCheckout() {
     if (address != "") {
       let createOrderData = {
@@ -123,7 +93,6 @@ const CheckoutPage = () => {
         customerId: accountUser?._id,
         shippingAddress: address,
       };
-      //console.log("hi", createOrderData);
       const response = await fetch(
         "https://soleauthenticity.azurewebsites.net/api/orders/order",
         {
@@ -136,9 +105,6 @@ const CheckoutPage = () => {
       const dataRes = await response.json();
       try {
         const promises = ids.map((id, index) => {
-          // console.log(id);
-          // console.log(dataRes.data);
-          // console.log(quantities[index]);
           const creatOrderDetailsData: any = {
             orderId: dataRes.data,
             productId: id,
@@ -162,10 +128,7 @@ const CheckoutPage = () => {
         } else {
           toast.error("Đơn hàng không hợp lệ, xin vui lòng kiểm tra lại thông tin");
         }
-        // successful();
-        //.log(responses);
-
-        dispatch(removeProduct(cart));
+        dispatch(clearCart());
         router.push("/");
       } catch (error) {
         console.log(error);
@@ -204,11 +167,11 @@ const CheckoutPage = () => {
                       }}
                     >{`${accountUser.name}`}</a>
                   ) : (
-                    <a href="/login" style={{ borderRadius: "10px" }}>
+                    <Link href="/login" style={{ borderRadius: "10px" }}>
                       <button className="btn btn--rounded btn--yellow">
                         Log in
                       </button>
-                    </a>
+                    </Link>
                   )}
                 </div>
 

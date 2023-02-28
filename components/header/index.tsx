@@ -73,6 +73,11 @@ const Header = ({ isErrorPage }: HeaderType) => {
 
   useEffect(() => {
     const storeObject = localStorage.getItem("user");
+    if (storeObject === "Admin") {
+      // setAccountUser(JSON.parse(storeObject));
+      return;
+    }
+    
     if (storeObject) {
       setAccountUser(JSON.parse(storeObject));
     }
